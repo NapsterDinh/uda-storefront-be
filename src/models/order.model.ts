@@ -1,18 +1,18 @@
 export interface OrderProduct {
   id: number;
-  orderId: number;
-  productId: number;
+  order_id: number;
+  product_id: number;
   quantity: number;
 }
 
 export interface Order {
   id: number;
   products: OrderProduct[];
-  userId: number;
+  user_id: number;
 }
 
 export type PayloadCreateOrder = Omit<Order, 'id' | 'products'> & {
-  products: Omit<OrderProduct, 'id' | 'orderId'>[];
+  products: Omit<OrderProduct, 'id' | 'order_id'>[];
 };
 
 export type PayloadUpdateOrder = Order;

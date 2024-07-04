@@ -70,25 +70,26 @@ CREATE TABLE IF NOT EXISTS users (
 
 - id of each product in the order
 - quantity of each product in the order
-- userId
+- user_id
 
 ```sql
 CREATE TABLE orders (
     id SERIAL PRIMARY KEY,
-    userId INTEGER NOT NULL REFERENCES users (id),
+    user_id INTEGER NOT NULL REFERENCES users (id),
 );
 ```
 
 #### order_products
 
-- orderId
-- productId
+- order_id
+- product_id
 - quantity
 
 ```sql
-CREATE TABLE orderProducts (
-    orderId INTEGER NOT NULL REFERENCES orders (id),
-    productId INTEGER NOT NULL REFERENCES products (id),
+CREATE TABLE order_products (
+    id SERIAL PRIMARY KEY,
+    order_id INTEGER NOT NULL REFERENCES orders (id),
+    product_id INTEGER NOT NULL REFERENCES products (id),
     quantity INTEGER NOT NULL
 );
 ```

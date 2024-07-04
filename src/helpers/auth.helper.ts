@@ -8,7 +8,7 @@ export const generateToken = (user: Pick<User, 'id' | 'username'>) => {
   return jwt.sign({ user }, SECRET);
 };
 
-export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+export const verifyToken = (req: Request, res: Response, next: NextFunction) => {  
   if (!req.headers.authorization) {
     return res.status(401).json({ error: 'Invalid token' });
   }

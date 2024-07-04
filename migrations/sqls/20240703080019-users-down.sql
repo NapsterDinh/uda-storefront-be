@@ -1,1 +1,1 @@
-DROP TABLE users
+delete from users where id > 0;

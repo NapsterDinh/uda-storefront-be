@@ -10,36 +10,59 @@ This section contains all the packages used in this project and how to install t
 
 `yarn` or `npm i`
 
-## Set up
-
-### Set up database
-
-`docker-compose up -d` to start the docker container in background
-`npm i` to install all dependencies
-`db-migrate up` to set up the database and get access via http://localhost:5432
-`npm run build` to build the app
-
-### Migrate Database
-
-Navigate to the root directory and run the command below to migrate the database
-
-`npm run migrate-up`
-
 ### Environmental Variables Set up
 
 Bellow are the environmental variables that needs to be set in a `.env` file. This is the default setting that I used for development, but you can change it to what works for you.
 
 ```bash
-PORT=5432
+PORT=3000
+POSTGRES_PORT=5432
 POSTGRES_HOST="localhost"
-POSTGRES_USER="###"
-POSTGRES_PASSWORD="###"
-POSTGRES_DB="store_front_pg_data"
-POSTGRES_TEST_DB="postgres"
-TOKEN_KEY=###
-ENV=test
-BCRYPT_PASSWORD=###
+POSTGRES_USER="admin"
+POSTGRES_PASSWORD="123456"
+POSTGRES_DB="storefront_dev"
+TOKEN_KEY=token
+ENV=dev
 SALT_ROUNDS="10"
+```
+
+
+## Set up
+
+### Set up database
+1. Make sure you already install `Docker` on your local machine
+
+2. `docker-compose up -d` to start the docker container in background
+
+3. `docker container list` to view all container which running on you local machine. Pick `container_id` of `uda-storefront-be-storefront_dev-1`
+4. `docker exec -it uda-storefront-be-storefront_dev-1 psql -U admin` to open `psql` cli
+
+5. Run this command to create database for dev environment
+```bash 
+create database storefront_dev;
+\l     #to view list database
+\q     #to quit psql
+```
+
+6. Repeat step 3-5 to create database for `test` environment. Change database name in command from `storefront_dev` to `storefront_test`
+
+7. `npm i` to install all dependencies
+
+8. `npm run migrate-up` to set up the database and get access via http://localhost:5432
+
+9. `npm run build` to build the app
+
+10. For processing to database, run this command:
+```bash
+docker exec -it uda-storefront-be-storefront_dev-1 psql -U admin storefront_dev
+```
+
+### Migrate Database
+
+- Navigate to the root directory and run the command below to migrate the database
+
+```bash 
+npm run migrate-up
 ```
 
 ## Start App
