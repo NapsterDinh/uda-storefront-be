@@ -25,8 +25,6 @@ export default class AuthController {
     if (!createUser) {
       return res.status(400).send('Has error occur. Try again');
     }
-    return res.status(200).send({
-      createUser,
-    });
+    return res.status(200).send(createUser);
   }
 }

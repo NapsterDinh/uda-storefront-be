@@ -4,31 +4,33 @@ import bcrypt from 'bcrypt';
 
 const SALT_ROUNDS = process.env.SALT_ROUNDS;
 
-async function getUser(userName: string) {
+async function getUser(userName: string): Promise<User | undefined> {
   try {
     const sql = {
       text: 'Select * from users where users.username = $1',
       values: [userName],
     };
-    return await databaseClient.executeQuery(sql.text, sql.values);
+    const result = await databaseClient.executeQuery(sql.text, sql.values)
+    return result?.rows?.[0]
   } catch (e) {
     throw new Error('Has error occur!!');
   }
 }
 
-async function getUserById(id: number) {
+async function getUserById(id: number):Promise<User | undefined>  {
   try {
     const sql = {
       text: 'Select * from users where users.id = $1',
       values: [id],
     };
-    return await databaseClient.executeQuery(sql.text, sql.values);
+    const result = await databaseClient.executeQuery(sql.text, sql.values)
+    return result?.rows?.[0]
   } catch (e) {
     throw new Error('Has error occur!!');
   }
 }
 
-async function createUser(newUserPayload: PayloadCreateUser) {
+async function createUser(newUserPayload: PayloadCreateUser):Promise<User | undefined>  {
   try {
     const hashPassword = bcrypt.hashSync(newUserPayload.password, Number(SALT_ROUNDS));
     const newUser: PayloadCreateUser = {
@@ -39,9 +41,8 @@ async function createUser(newUserPayload: PayloadCreateUser) {
       email: newUserPayload.email.trim(),
     };
     const result = await getUser(newUser.username);
-    const user = result?.rows?.[0];
     
-    if (user) {
+    if (result) {
       throw new Error('Username is already exist!!!');
     }
     const sql =
@@ -65,38 +66,35 @@ async function createUser(newUserPayload: PayloadCreateUser) {
   }
 }
 
-async function getAllUsers() {
+async function getAllUsers(): Promise<User[]> {
   try {
-    const sql = 'Select username, fullName, phoneNumber, email from users';
+    const sql = 'Select * from users';
     const result = await databaseClient.executeQuery(sql);
-    const allUsers: Omit<User, 'password'>[] = result?.rows ?? [];
-    return allUsers;
+    return result?.rows ?? []
   } catch (err) {
     throw new Error(`Get users error. ${err}`);
   }
 }
 
-async function updateUser(id: number, newUpdatedUserData: PayloadUpdateUser) {
+async function updateUser(id: number, newUpdatedUserData: PayloadUpdateUser): Promise<User | undefined> {
   try {
-    const sql = 'UPDATE users SET fullName = $1, phoneNumber = $2, email = $3 WHERE id = $4 RETURNING *';
+    const sql = `UPDATE users SET fullName = $1, phoneNumber = $2, email = $3 WHERE id = $4 RETURNING *`;
     const result = await databaseClient.executeQuery(sql, [
       newUpdatedUserData.fullName,
       newUpdatedUserData.phoneNumber,
       newUpdatedUserData.email,
       id,
     ]);
-    if (!result?.rows[0]) return null;
-    const { password: _, ...user }: User = result?.rows[0];
-    return user;
+    return result?.rows?.[0];
   } catch (err) {
     throw new Error('Can not update user');
   }
 }
-async function deleteUserById(id: number) {
+async function deleteUserById(id: number): Promise<boolean> {
   try {
     const sql = 'DELETE FROM users WHERE id=$1';
-    await databaseClient.executeQuery(sql, [id]);
-    return true;
+    const result = await databaseClient.executeQuery(sql, [id]);
+    return !!result.rowCount
   } catch (err) {
     throw new Error('Can not delete user');
   }

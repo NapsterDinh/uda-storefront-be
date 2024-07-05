@@ -8,8 +8,8 @@ async function authenticate(props: { username: string; password: string }) {
 
   try {
     const result = await userService.getUser(username);
-    if (result.rows.length) {
-      const { password: hashedPassword, ...user }: User = result.rows[0];
+    if (result) {
+      const { password: hashedPassword, ...user }: User = result;
 
       if (bcrypt.compareSync(password, hashedPassword)) {
         const token = generateToken({

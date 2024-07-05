@@ -15,10 +15,10 @@ export default class UserController {
     const {id} = req.params;
     try {
       const user = await userService.getUserById(Number(id));
-      if(!user?.rows?.[0]){
+      if(!user){
         return res.status(400).send(`User: ${id} does not exist!!!`);
       }
-      res.status(200).json({ user: user?.rows?.[0] });
+      res.status(200).json(user);
     } catch (error) {
       return res.status(400).send(`User: ${id} does not exist!!!`);
     }
@@ -28,7 +28,7 @@ export default class UserController {
     const {id} = req.params;
     try {
       const user = await userService.updateUser(Number(id), payload);
-      res.status(200).json({ user });
+      res.status(200).json(user);
     } catch (error) {
       return res.status(400).send('Has error occur. Try again');
     }

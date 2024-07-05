@@ -1,7 +1,7 @@
 import { Order, OrderProduct, PayloadCreateOrder, PayloadUpdateOrder } from '../models/order.model';
 import { databaseClient } from './database.service';
 
-async function getOrderById(id: number) {
+async function getOrderById(id: number): Promise<Order | undefined> {
   try {
     const query = 'SELECT * FROM orders where orders.id = $1';
     const result = await databaseClient.executeQuery(query, [id]);
@@ -22,7 +22,7 @@ async function getOrderById(id: number) {
   }
 }
 
-async function getOrdersByUser(id: number) {
+async function getOrdersByUser(id: number): Promise<Order[]> {
   try {
     const sql = 'SELECT * FROM orders WHERE user_id = $1';
     const result = await databaseClient.executeQuery(sql, [id]);
@@ -43,7 +43,7 @@ async function getOrdersByUser(id: number) {
   }
 }
 
-async function createOrder(newOrderPayload: PayloadCreateOrder) {
+async function createOrder(newOrderPayload: PayloadCreateOrder): Promise<Order | undefined> {
   const { products, user_id } = newOrderPayload;
 
   try {
@@ -70,12 +70,12 @@ async function createOrder(newOrderPayload: PayloadCreateOrder) {
   }
 }
 
-async function getAllOrders() {
+async function getAllOrders(): Promise<Order[]> {
   try {
     const sql = 'SELECT * FROM orders';
     const result = await databaseClient.executeQuery(sql);
 
-    if (!result?.rows?.[0]) return;
+    if (!result?.rows?.[0]) return [];
 
     const productOrderSql = 'SELECT product_id, quantity FROM order_products WHERE order_id= $1';
     const orders: Order[] = [];
@@ -93,7 +93,7 @@ async function getAllOrders() {
   }
 }
 
-async function updateOrder(id: number, newUpdatedOrderData: PayloadUpdateOrder) {
+async function updateOrder(id: number, newUpdatedOrderData: PayloadUpdateOrder): Promise<Order | undefined> {
   const { products } = newUpdatedOrderData;
 
   try {
@@ -131,7 +131,7 @@ async function updateOrder(id: number, newUpdatedOrderData: PayloadUpdateOrder) 
   }
 }
 
-async function deleteOrderById(id: number) {
+async function deleteOrderById(id: number): Promise<boolean> {
   try {
     const order_productsSql = 'DELETE FROM order_products WHERE order_id = $1 RETURNING *';
     const result = await databaseClient.executeQuery(order_productsSql, [id]);
@@ -141,9 +141,9 @@ async function deleteOrderById(id: number) {
     }
 
     const sql = 'DELETE FROM orders WHERE id= $1';
-    await databaseClient.executeQuery(sql, [id]);
+    const result2 = await databaseClient.executeQuery(sql, [id]);
 
-    return true;
+    return !!result2.rowCount
   } catch (err) {
     throw new Error('Has error occur!!');
   }

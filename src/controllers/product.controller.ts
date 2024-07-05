@@ -16,10 +16,10 @@ export default class ProductController {
     
     try {
       const product = await productService.getProductById(Number(id));
-      if(!product?.rows?.[0]){
+      if(!product){
         return res.status(400).send(`product: ${id} does not exist!!!`);
       }
-      res.status(200).json({ product: product?.rows?.[0] });
+      res.status(200).json({ product: product });
     } catch (error) {
       return res.status(400).send(`product: ${id} does not exist!!!`);
     }
@@ -31,7 +31,7 @@ export default class ProductController {
       if(!product){
         return res.status(400).send('Has error occur. Try again');
       }
-      res.status(200).json({ product });
+      res.status(200).json(product);
     } catch (error) {
       return res.status(400).send('Has error occur. Try again');
     }
@@ -41,7 +41,7 @@ export default class ProductController {
     const {id} = req.params;
     try {
       const product = await productService.updateProduct(Number(id), payload);
-      res.status(200).json({ product });
+      res.status(200).json(product);
     } catch (error) {
       return res.status(400).send('Has error occur. Try again');
     }

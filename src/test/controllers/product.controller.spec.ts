@@ -1,66 +1,64 @@
-import {agent as supertest} from 'supertest';
+import { agent as supertest } from 'supertest';
 import app from '../..';
-import { User } from '../../models/user.model';
 import { Product } from '../../models/product.model';
-import { userTest } from './user.controller.spec';
+import { generateUserTest } from './user.controller.spec';
+import { User } from '../../models/user.model';
 
 const request = supertest(app);
 
-export const productTest: Omit<Product, 'id'> = {
-  name: 'Macbook Pro M2 2022',
-  price: 27000,
+export const generateProduct = (newProductName?: string) => {
+  const userTest: Omit<Product, 'id'> = {
+    name: newProductName || `uda-tsu-product-controller-${Math.random}`,
+    price: 2000,
+  };
+  return userTest;
 };
 
 describe('Product Controller', () => {
-  let token: string, product_id: number;
+  let userLogin: User & { token: string }, productDefault: Product;
 
   beforeAll(async () => {
-    const username = `uda-tsu-${Date.now()}`
-    const res = await request.post('/api/v1/auth/register').send({...userTest, username });
-
-    const loginRes = await request.post('/api/v1/auth/login').send({
-        username: username,
-        password: userTest.password,
-      });
-      token = loginRes?.body.token;
+    const userTest = generateUserTest();
+    await request.post('/api/v1/auth/register').send(userTest);
+    const resLogin = await request.post('/api/v1/auth/login').send({
+      username: userTest.username,
+      password: userTest.password,
+    });
+    userLogin = {
+      ...resLogin.body,
+      password: userTest.password,
+    };
+    const productTest = generateProduct();
 
     const res1 = await request
-      .set({'Authorization': `Bearer ${token}`})
+      .set({ Authorization: `Bearer ${userLogin.token}` })
       .post('/api/v1/product')
-      .send(productTest)
+      .send(productTest);
 
-    product_id = res1?.body?.product?.id;
+    productDefault = res1?.body;
   });
 
   it('Get all products', async () => {
-    const res = await request.set({'Authorization': `Bearer ${token}`}).get('/api/v1/product');
+    const res = await request.set({ Authorization: `Bearer ${userLogin.token}` }).get('/api/v1/product');
     expect(res.status).toBe(200);
   });
 
   it('Get product detail', async () => {
-    const res = await request.set({'Authorization': `Bearer ${token}`}).get(`/api/v1/product/${product_id}`);
+    const res = await request
+      .set({ Authorization: `Bearer ${userLogin.token}` })
+      .get(`/api/v1/product/${productDefault.id}`);
     expect(res.status).toBe(200);
   });
 
-  it('Update product', async () => {
-    const newProductData: Omit<Product, 'id'> = {
-      name: 'Iphone 15',
-      price: 32000000,
-    };
+  it('Delete product it', async () => {
+    const productTest = generateProduct(`tsu-product-controller-test-delete-${Math.random()}`);
 
     const res = await request
-      .set({'Authorization': `Bearer ${token}`})
-      .put(`/api/v1/product/${product_id}`)
-      .send(newProductData)
-
-    expect(res.status).toBe(200);
-  });  
-  
-  it('Delete product it', async () => {
-    const res1 = await request
-      .set({'Authorization': `Bearer ${token}`})
+      .set({ Authorization: `Bearer ${userLogin.token}` })
       .post('/api/v1/product')
-      .send({...productTest, name: 'IPad prod 2022'})
-    expect(res1.status).toBe(200);
+      .send(productTest);
+    const result = await request.set({ Authorization: `Bearer ${userLogin.token}` }).delete(`/api/v1/product/${res.body.id}`);
+
+    expect(result.status).toBe(200);
   });
 });

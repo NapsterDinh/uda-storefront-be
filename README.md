@@ -34,7 +34,7 @@ SALT_ROUNDS="10"
 
 2. `docker-compose up -d` to start the docker container in background
 
-3. `docker container list` to view all container which running on you local machine. Pick `container_id` of `uda-storefront-be-storefront_dev-1`
+3. `docker container list` to view all container which running on you local machine.
 4. `docker exec -it uda-storefront-be-storefront_dev-1 psql -U admin` to open `psql` cli
 
 5. Run this command to create database for dev environment
@@ -44,15 +44,13 @@ create database storefront_dev;
 \q     #to quit psql
 ```
 
-6. Repeat step 3-5 to create database for `test` environment. Change database name in command from `storefront_dev` to `storefront_test`
+6. `npm i` to install all dependencies
 
-7. `npm i` to install all dependencies
+7. `npm run migrate-up` to set up the database and get access via http://localhost:5432
 
-8. `npm run migrate-up` to set up the database and get access via http://localhost:5432
+8. `npm run build` to build the app
 
-9. `npm run build` to build the app
-
-10. For processing to database, run this command:
+9. For processing to database again, run this command:
 ```bash
 docker exec -it uda-storefront-be-storefront_dev-1 psql -U admin storefront_dev
 ```

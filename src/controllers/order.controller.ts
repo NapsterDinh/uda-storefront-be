@@ -19,7 +19,7 @@ export default class OrderController {
       {
         return res.status(400).send(`Order: ${id} does not exist!!!`);
       }
-      res.status(200).json({ order });
+      res.status(200).json(order);
     } catch (error) {
       return res.status(400).send(`Order: ${id} does not exist!!!`);
     }
@@ -31,7 +31,7 @@ export default class OrderController {
       if(!order){
         return res.status(400).send(`Order with userId: ${userId} does not exist!!!`);
       }
-      res.status(200).json({ order });
+      res.status(200).json(order);
     } catch (error) {
       return res.status(400).send(`Order with userId: ${userId} does not exist!!!`);
     }
@@ -43,7 +43,7 @@ export default class OrderController {
       if(!order){
         return res.status(400).send('Has error occur. Try again');
       }
-      res.status(200).json({ order });
+      res.status(200).json(order);
     } catch (error) {
       return res.status(400).send('Has error occur. Try again');
     }
@@ -56,7 +56,7 @@ export default class OrderController {
       if(!order){
         return res.status(400).send('Has error occur. Try again');
       }
-      res.status(200).json({ order });
+      res.status(200).json(order);
     } catch (error) {
       return res.status(400).send('Has error occur. Try again');
     }
